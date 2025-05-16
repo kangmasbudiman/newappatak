@@ -4,18 +4,26 @@
     package="com.atakmyloc.com">
 
     <!-- added these permissions -->
-        <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-<uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 <!-- Optional, you'll have to check this permission by yourself. -->
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- mulai nambah untuk vidio call-->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+
 
 
    <application
-        android:label="AMARTA"
+        android:label="MAK-BRI"
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">
 
@@ -23,6 +31,7 @@
             <meta-data android:name="com.google.android.geo.API_KEY"
                android:value="AIzaSyDa8nbajHMiviV87-4DRPhyB4ukjuuSZhk"/>
 
+    <meta-data android:name="com.mapbox.token" android:value="pk.eyJ1IjoiYW1hcnRhbWVkaWEiLCJhIjoiY2w2YmxwODd2NHBzZDNqbzFjNzF5Z3kwYiJ9.6wJHFvslTrdAYy2NUZkt-Q" />
 
         <activity
             android:name=".MainActivity"

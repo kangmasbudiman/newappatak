@@ -54,7 +54,8 @@ class _HomeBodyState extends State<HomeBody> {
                         mapToolbarEnabled: false,
                         onTap: (loc) {
                           //print(loc);
-                          mapProv.maptap(loc);
+                          
+                            mapProv.maptap(loc);
                         },
                         polygons: mapProv.polygons,
                       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_map_live/newgoto/screens/current_location_screen.dart';
 import 'package:google_map_live/newgoto/screens/search_places_screen.dart';
 import 'package:google_map_live/newgoto/screens/simple_map_screen.dart';
@@ -12,6 +13,37 @@ class HomeScreen2 extends StatefulWidget {
 }
 
 class _HomeScreen2State extends State<HomeScreen2> {
+
+
+
+
+ @override
+  void initState() {
+    super.initState();
+    
+      SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+       DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+
+  ]);
+  }
+
+  @override
+  void dispose() {
+     SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeRight,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+    super.dispose();
+  }
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

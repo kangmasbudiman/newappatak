@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/services.dart';
 import 'package:google_map_live/contohchat/chetscreen.dart';
 import 'package:google_map_live/screens/japri.dart';
 
@@ -17,6 +18,32 @@ class _LiskontakState extends State<Liskontak> {
           .collection('location')
           .where('online', isEqualTo: 1)
           .snapshots();
+
+
+ @override
+  void initState() {
+    super.initState();
+    
+      SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+       DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+
+  ]);
+  }
+
+  @override
+  void dispose() {
+     SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeRight,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {

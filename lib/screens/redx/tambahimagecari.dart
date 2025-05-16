@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_map_live/core/models/listimagelokasicari.dart';
 
 import 'package:google_map_live/core/models/listvidiolokasicari.dart';
@@ -83,12 +84,27 @@ class _AllimageState extends State<Allimage> {
   void initState() {
     super.initState();
     getCurrentLocation();
+        SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeRight,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   }
 
   @override
   void dispose() {
+      SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeRight,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
     super.dispose();
+
   }
+
+ 
 
   _initUI() {
     allTFBorder = OutlineInputBorder(

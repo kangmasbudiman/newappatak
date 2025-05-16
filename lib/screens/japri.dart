@@ -54,6 +54,13 @@ class _JapriState extends State<Japri> {
     getProfiles();
   }
 
+
+
+
+
+
+  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

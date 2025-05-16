@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_map_live/Register.dart';
 import 'package:google_map_live/restapi/restApi.dart';
 import 'package:google_map_live/screens/botomnavy.dart';
 import 'package:google_map_live/screens/dasboard.dart';
@@ -23,7 +24,7 @@ class Wrapperr extends StatefulWidget {
 }
 
 class _WrapperrState extends State<Wrapperr> {
-  bool _isLoading = false;
+  bool _isLoading1 = false;
   String idku = "";
   String id = "";
   int akses;
@@ -33,7 +34,7 @@ class _WrapperrState extends State<Wrapperr> {
     id = preferences.getInt("id").toString();
 
     setState(() {
-      _isLoading = false;
+      _isLoading1 = false;
       idku = id;
       print("ini idku");
       print(idku);
@@ -54,7 +55,7 @@ class _WrapperrState extends State<Wrapperr> {
 
   @override
   Widget build(BuildContext context) {
-    return _isLoading
+    return _isLoading1
         ? CircularProgressIndicator()
         : idku != "null"
             ? Dashboard()

@@ -15,14 +15,13 @@ class PolyMakerServices {
   //Function to get all polygon locations
   Future<List<PolyMakerModel>> getAll() async {
     var _result = await _polyMakerDb.getAll();
-
+    print(_result);
     var data = new List<PolyMakerModel>();
 
     for (var polyMaker in _result) {
-   
       var _locResult =
           await _polyMakerDb.getLocationByPolygonID(polyMaker["id"]);
-          
+
       var _locData = new List<LocationModel>();
 
       for (var value in _locResult) {

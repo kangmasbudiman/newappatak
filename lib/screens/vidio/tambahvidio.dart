@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_map_live/core/models/listvidiolokasi.dart';
 import 'package:google_map_live/restapi/restApi.dart';
 import 'package:google_map_live/screens/vidio/playvidio.dart';
@@ -44,7 +45,24 @@ class _TambahvidioState extends State<Tambahvidio> {
     // TODO: implement initState
     super.initState();
     tampinamalokasi();
+     SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeRight,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   }
+    @override
+  void dispose() {
+     SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeRight,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {

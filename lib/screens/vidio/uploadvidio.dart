@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_map_live/restapi/restApi.dart';
 import 'package:google_map_live/screens/vidio/viewvidio.dart';
 
@@ -49,7 +50,7 @@ class _UploadvidioState extends State<Uploadvidio> {
             child: ListBody(
               children: const <Widget>[
                 Text(
-                  'Upload Berhasil',
+                  'Upload Vidio Succes',
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -59,10 +60,9 @@ class _UploadvidioState extends State<Uploadvidio> {
             TextButton(
               child: const Text('OK'),
               onPressed: () {
-                    Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Viewvidio()));
+                Navigator.pop(context);
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => Viewvidio()));
               },
             ),
           ],
@@ -81,7 +81,7 @@ class _UploadvidioState extends State<Uploadvidio> {
             child: ListBody(
               children: const <Widget>[
                 Text(
-                  'Upload Vidio Berhasil',
+                  'Upload Vidio Succes',
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -92,6 +92,8 @@ class _UploadvidioState extends State<Uploadvidio> {
               child: const Text('OK'),
               onPressed: () {
                 Navigator.pop(context);
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => Viewvidio()));
               },
             ),
           ],
@@ -128,8 +130,23 @@ class _UploadvidioState extends State<Uploadvidio> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    print("id vidio ku ");
-    print(widget.id);
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  }
+
+  @override
+  void dispose() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    super.dispose();
   }
 
   @override
@@ -151,7 +168,17 @@ class _UploadvidioState extends State<Uploadvidio> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  Text(
+                    "Pilih vidio yang akan di upload",
+                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
                   ElevatedButton(
+                      style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.black),
+                          textStyle: MaterialStateProperty.all(
+                              TextStyle(fontSize: 15))),
                       onPressed: () {
                         pickvidio();
                       },
@@ -159,6 +186,11 @@ class _UploadvidioState extends State<Uploadvidio> {
                   Text(vidiourl != null ? vidiourl : "Select"),
                   Text("Upload vidio"),
                   ElevatedButton(
+                      style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.black),
+                          textStyle: MaterialStateProperty.all(
+                              TextStyle(fontSize: 15))),
                       onPressed: () {
                         save();
                       },

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:google_map_live/core/models/listvidiolokasicari.dart';
 import 'package:google_map_live/restapi/restApi.dart';
@@ -9,6 +10,7 @@ import 'package:google_map_live/screens/vidio/uploadvidio.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Allvidio extends StatefulWidget {
   @override
@@ -35,7 +37,36 @@ class _AllvidioState extends State<Allvidio> {
   List<Listvidiocari> _list = [];
   List<Listvidiocari> _search = [];
 
-  getCurrentLocation() async {
+  String idku = "";
+  String id = "";
+  int akses;
+  String nama_lengkap1 = "";
+  String nama_lengkap = "";
+  String no_wa = "";
+  String no_wa1 = "";
+  String idgroup1 = "";
+  String idgroup = "";
+  bool _isLoading = false;
+  Future<String> getProfiles() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    id = preferences.getInt("id").toString();
+    nama_lengkap = preferences.getString("nama_lengkap").toString();
+    no_wa = preferences.getString("no_wa").toString();
+    idgroup = preferences.getString("idgroup").toString();
+    setState(() {
+      _isLoading = false;
+      idku = id;
+      nama_lengkap1 = nama_lengkap;
+      no_wa1 = no_wa;
+      idgroup1 = idgroup;
+      
+      getCurrentLocation("1");
+      print(idgroup1);
+    });
+  }
+
+  getCurrentLocation(String kodesort) async {
+    print(idku);
     setState(() {
       loadingvidio = true;
     });
@@ -45,7 +76,12 @@ class _AllvidioState extends State<Allvidio> {
       loadingdokter = true;
     });
 
-    final responsee = await http.get(Uri.parse(RestApi.getvidio));
+    //final responsee = await http.get(Uri.parse(RestApi.getvidio));
+    final responsee = await http.post(Uri.parse(RestApi.getvidio), body: {
+      "idgroup": idgroup1,
+      "kodesort": kodesort,
+    });
+
     if (responsee.statusCode == 200) {
       final datadokter = jsonDecode(responsee.body);
       print(datadokter);
@@ -76,14 +112,61 @@ class _AllvidioState extends State<Allvidio> {
     setState(() {});
   }
 
+  Future<void> _pesantidakadavidio() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text(
+                  'Vidio Tidak Ada',
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                TextButton(
+                  child: Icon(Icons.cancel, size: 35, color: Colors.black),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
-    getCurrentLocation();
+    getProfiles();
+    getCurrentLocation("1");
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
   }
 
   @override
   void dispose() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     super.dispose();
   }
 
@@ -102,23 +185,43 @@ class _AllvidioState extends State<Allvidio> {
         home: Scaffold(
             key: _scaffoldKey,
             appBar: new AppBar(
-                leading: new IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: Container(
-                    decoration:
-                        BoxDecoration(shape: BoxShape.circle, boxShadow: []),
-                    child: new Icon(Icons.arrow_back_ios, color: Colors.white),
-                  ),
+              leading: new IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Container(
+                  decoration:
+                      BoxDecoration(shape: BoxShape.circle, boxShadow: []),
+                  child: new Icon(Icons.arrow_back_ios, color: Colors.white),
                 ),
-                backgroundColor: Colors.green,
-                title: Text("Search",
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.white,
-                      fontFamily: 'Kali',
-                    ))),
+              ),
+              backgroundColor: Colors.black,
+              title: Text("Daftar Vidio",
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.white,
+                    fontFamily: 'Kali',
+                  )),
+              actions: [
+                Row(
+                  children: [
+                    IconButton(
+                        onPressed: () {
+                          getCurrentLocation("1");
+                        },
+                        icon: Icon(Icons.download)),
+                    SizedBox(
+                      width: 2,
+                    ),
+                    IconButton(
+                        onPressed: () {
+                          getCurrentLocation("2");
+                        },
+                        icon: Icon(Icons.upload)),
+                  ],
+                )
+              ],
+            ),
             body: ListView(
               children: [
                 Padding(
@@ -186,13 +289,17 @@ class _AllvidioState extends State<Allvidio> {
 
                                                   return InkWell(
                                                     onTap: () {
-                                                      Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  Playvidio(
-                                                                      vidio: dt
-                                                                          .vidio)));
+                                                      if (dt.vidio == null) {
+                                                        _pesantidakadavidio();
+                                                      } else {
+                                                        Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                                builder: (context) =>
+                                                                    Playvidio(
+                                                                        vidio: dt
+                                                                            .vidio)));
+                                                      }
                                                     },
                                                     child: Padding(
                                                       padding:
@@ -208,7 +315,19 @@ class _AllvidioState extends State<Allvidio> {
                                                             height: 7,
                                                           ),
                                                           InkWell(
-                                                            onTap: () {},
+                                                            onTap: () {
+                                                              if (dt.vidio ==
+                                                                  null) {
+                                                                _pesantidakadavidio();
+                                                              } else {
+                                                                Navigator.push(
+                                                                    context,
+                                                                    MaterialPageRoute(
+                                                                        builder:
+                                                                            (context) =>
+                                                                                Playvidio(vidio: dt.vidio)));
+                                                              }
+                                                            },
                                                             child: Container(
                                                               height: 60,
                                                               decoration:
@@ -239,6 +358,9 @@ class _AllvidioState extends State<Allvidio> {
                                                                             .all(
                                                                         8.0),
                                                                 child: Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .spaceBetween,
                                                                   children: [
                                                                     Column(
                                                                       mainAxisAlignment:
@@ -262,9 +384,11 @@ class _AllvidioState extends State<Allvidio> {
                                                                             )),
                                                                       ],
                                                                     ),
+/*
                                                                     InkWell(
                                                                       onTap:
                                                                           () {
+
                                                                         Navigator.push(
                                                                             context,
                                                                             MaterialPageRoute(
@@ -280,6 +404,7 @@ class _AllvidioState extends State<Allvidio> {
                                                                             40,
                                                                       ),
                                                                     ),
+                                                                    */
                                                                   ],
                                                                 ),
                                                               ),
@@ -314,12 +439,17 @@ class _AllvidioState extends State<Allvidio> {
                                                           ),
                                                           InkWell(
                                                             onTap: () {
-                                                              Navigator.push(
-                                                                  context,
-                                                                  MaterialPageRoute(
-                                                                      builder: (context) =>
-                                                                          Playvidio(
-                                                                              vidio: dr.vidio)));
+                                                              if (dr.vidio ==
+                                                                  null) {
+                                                                _pesantidakadavidio();
+                                                              } else {
+                                                                Navigator.push(
+                                                                    context,
+                                                                    MaterialPageRoute(
+                                                                        builder:
+                                                                            (context) =>
+                                                                                Playvidio(vidio: dr.vidio)));
+                                                              }
                                                             },
                                                             child: Container(
                                                               height: 60,

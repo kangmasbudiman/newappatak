@@ -2,14 +2,22 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_map_live/Register.dart';
 import 'package:google_map_live/res/custom_colors.dart';
 import 'package:google_map_live/restapi/restApi.dart';
 import 'package:google_map_live/screens/botomnavy.dart';
+import 'package:google_map_live/screens/dasboard.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+
+enum Orientation {
+  potrait,
+  landscape,
+}
 
 class Signin4Page extends StatefulWidget {
   @override
@@ -35,6 +43,10 @@ class _Signin4PageState extends State<Signin4Page> {
     String nama_lengkap,
     emel,
     no_wa,
+    idgroup,
+    avatar,
+    jabatan,
+    nip,
   ) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
@@ -43,6 +55,10 @@ class _Signin4PageState extends State<Signin4Page> {
       preferences.setString('nama_lengkap', nama_lengkap);
       preferences.setString('email', emel);
       preferences.setString('no_wa', no_wa);
+      preferences.setString('idgroup', idgroup);
+      preferences.setString('foto', avatar);
+      preferences.setString('jabatan', jabatan);
+      preferences.setString('nip', nip);
       preferences.commit();
     });
   }
@@ -62,12 +78,17 @@ class _Signin4PageState extends State<Signin4Page> {
     String nama_lengkap = data['nama_lengkap'];
     String emel = data['email'];
     String nowa = data['no_wa'];
+    String idgroup = data['idgroup'].toString();
+    String avatar = data['foto'];
     int id = data['id'];
+    String jabatan = data['jabatan'].toString( );
+    String nip = data['nip'];
     if (value == 1) {
       setState(() {
-        savePref(value, id, nama_lengkap, emel, nowa);
+        savePref(
+            value, id, nama_lengkap, emel, nowa, idgroup, avatar, jabatan, nip);
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => Navybuttom()));
+            context, MaterialPageRoute(builder: (context) => Dashboard()));
       });
     } else if (value == 5) {
       _pesanterhubung();
@@ -149,116 +170,143 @@ class _Signin4PageState extends State<Signin4Page> {
   void initState() {
     super.initState();
     _requestpermision();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
   }
 
   @override
   void dispose() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: CustomColors.firebaseNavy,
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: <Widget>[
-                //  Center(child: Image.asset('assets/867087.png', height: 130)),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height / 3,
-                ),
-                Text('Sign In',
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.tealAccent.shade700)),
-                TextFormField(
-                  controller: email,
-                  keyboardType: TextInputType.emailAddress,
-                  style: TextStyle(color: Colors.amber),
-                  decoration: InputDecoration(
-                    focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: _mainColor, width: 2.0)),
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: _underlineColor),
-                    ),
-                    labelText: 'Email',
-                    labelStyle: TextStyle(color: Colors.amber),
+        //  backgroundColor: CustomColors.firebaseNavy,
+        body: Container(
+      decoration: new BoxDecoration(
+        image: new DecorationImage(
+          image: new AssetImage('assets/atak_splash_blank.png'),
+          fit: BoxFit.cover,
+        ),
+      ),
+      // color: Colors.green,
+      child: ListView(
+        children: [
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: <Widget>[
+                  //  Center(child: Image.asset('assets/867087.png', height: 130)),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height / 5,
                   ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                TextField(
-                  controller: password,
-                  obscureText: _obscureText,
-                  style: TextStyle(color: Colors.amber),
-                  decoration: InputDecoration(
-                    focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                            color: Colors.tealAccent.shade400, width: 2.0)),
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: _underlineColor),
-                    ),
-                    labelText: 'Password',
-                    labelStyle: TextStyle(color: _color2),
-                    suffixIcon: IconButton(
-                        icon: Icon(_iconVisible,
-                            color: Colors.grey[400], size: 20),
-                        onPressed: () {
-                          _toggleObscureText();
-                        }),
-                  ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                TextButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                        (Set<MaterialState> states) =>
-                            Colors.tealAccent.shade700,
+                  Text('Masuk',
+                      style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.tealAccent.shade700)),
+                  TextFormField(
+                    controller: email,
+                    keyboardType: TextInputType.emailAddress,
+                    style: TextStyle(color: Colors.amber),
+                    decoration: InputDecoration(
+                      focusedBorder: UnderlineInputBorder(
+                          borderSide:
+                              BorderSide(color: _mainColor, width: 2.0)),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: _underlineColor),
                       ),
-                      overlayColor:
-                          MaterialStateProperty.all(Colors.transparent),
-                      shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(3.0),
+                      labelText: 'Email',
+                      labelStyle: TextStyle(color: Colors.amber),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  TextField(
+                    controller: password,
+                    obscureText: _obscureText,
+                    style: TextStyle(color: Colors.amber),
+                    decoration: InputDecoration(
+                      focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Colors.tealAccent.shade400, width: 2.0)),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: _underlineColor),
+                      ),
+                      labelText: 'Password',
+                      labelStyle: TextStyle(color: _color2),
+                      suffixIcon: IconButton(
+                          icon: Icon(_iconVisible,
+                              color: Colors.grey[400], size: 20),
+                          onPressed: () {
+                            _toggleObscureText();
+                          }),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  TextButton(
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.resolveWith<Color>(
+                          (Set<MaterialState> states) =>
+                              Colors.tealAccent.shade700,
+                        ),
+                        overlayColor:
+                            MaterialStateProperty.all(Colors.transparent),
+                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(3.0),
+                        )),
+                      ),
+                      onPressed: () {
+                        registrasi();
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 5),
+                        child: Text(
+                          'LOGIN',
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
                       )),
-                    ),
-                    onPressed: () {
-                      registrasi();
+                  SizedBox(
+                    height: 20,
+                  ),
+
+                  InkWell(
+                    onTap: () {
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => Registeruser()));
                     },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 5),
-                      child: Text(
-                        'LOGIN',
-                        style: TextStyle(fontSize: 16, color: Colors.white),
-                        textAlign: TextAlign.center,
-                      ),
-                    )),
-                SizedBox(
-                  height: 20,
-                ),
-/*
-            Center(
-              child: GestureDetector(
-                onTap: () {
-                  Fluttertoast.showToast(
-                      msg: 'Click signup', toastLength: Toast.LENGTH_SHORT);
-                  FocusScope.of(context).unfocus();
-                },
+                    child: Text("Daftar Disini..!",
+                        style: TextStyle(fontSize: 20, color: Colors.white)),
+                  )
+                ],
               ),
             ),
-            */
-              ],
-            ),
           ),
-        ));
+        ],
+      ),
+    ));
   }
 
   _requestpermision() async {

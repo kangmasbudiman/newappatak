@@ -1,5 +1,6 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
 
 class Playvidio extends StatefulWidget {
@@ -25,14 +26,28 @@ class _PlayvidioState extends State<Playvidio> {
     // TODO: implement initState
     super.initState();
      initializePlayer();
+      SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeRight,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   }
 @override
   void dispose() {
     _videoPlayerController1.dispose();
     _videoPlayerController2.dispose();
     _chewieController.dispose();
+     SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeRight,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
     super.dispose();
   }
+
+  
 
 
 Future<void> initializePlayer() async {

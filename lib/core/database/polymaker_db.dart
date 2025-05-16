@@ -6,6 +6,7 @@ import 'package:google_map_live/core/models/location_model.dart';
 import 'package:google_map_live/core/models/mylist.dart';
 import 'package:google_map_live/core/models/polymaker_model.dart';
 import 'package:google_map_live/restapi/restApi.dart';
+import 'package:location/location.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:http/http.dart' as http;
 
@@ -75,7 +76,7 @@ class PolyMakerDB {
     if (response.contentLength == 2) {
     } else {
       final datalatlang = jsonDecode(response.body);
-    
+
       var result = datalatlang;
 
       return result;
@@ -129,7 +130,8 @@ class PolyMakerDB {
       print("object");
       print(idterakhir.toString());
 
-      polyMakerModel.location.forEach((location) async {
+
+  polyMakerModel.location.forEach((location) async {
         final responsea = await http.post(Uri.parse(RestApi.latlang), body: {
           "polygon_id": idterakhir.toString(),
           "latitude": location.latitude.toString(),
@@ -140,6 +142,8 @@ class PolyMakerDB {
       print(e);
     }
 
+
+  
     Database db = await helper.database;
     var result = db.insert("polygon", polyMakerModel.toMap());
     //insert location

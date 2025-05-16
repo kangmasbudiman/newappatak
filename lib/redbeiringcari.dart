@@ -1,24 +1,25 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:google_map_live/core/models/listimagelokasicari.dart';
+import 'package:flutter/services.dart';
 
 import 'package:google_map_live/core/models/listvidiolokasicari.dart';
+import 'package:google_map_live/core/models/listviewredbeiring.dart';
+import 'package:google_map_live/multipolyline.dart';
 import 'package:google_map_live/restapi/restApi.dart';
-import 'package:google_map_live/screens/imagelokasi/daftarimage.dart';
-import 'package:google_map_live/screens/imagelokasi/uploadimage.dart';
 import 'package:google_map_live/screens/vidio/playvidio.dart';
 import 'package:google_map_live/screens/vidio/uploadvidio.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
-class Allimage extends StatefulWidget {
+class Ringbeiringview extends StatefulWidget {
   @override
-  _AllimageState createState() => _AllimageState();
+  _RingbeiringviewState createState() => _RingbeiringviewState();
 }
 
-class _AllimageState extends State<Allimage> {
+class _RingbeiringviewState extends State<Ringbeiringview> {
   //Theme Data
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -31,12 +32,38 @@ class _AllimageState extends State<Allimage> {
   double lon;
 
   var loadingvidio = false;
-  final listvidio = new List<Listimagecari>();
+  final listvidio = new List<Listviewredbeiring>();
 
   var loadingdokter = false;
 
-  List<Listimagecari> _list = [];
-  List<Listimagecari> _search = [];
+  List<Listviewredbeiring> _list = [];
+  List<Listviewredbeiring> _search = [];
+
+  String idku = "";
+  String id = "";
+  int akses;
+  String nama_lengkap1 = "";
+  String nama_lengkap = "";
+  String no_wa = "";
+  String no_wa1 = "";
+  String idgroup1 = "";
+  String idgroup = "";
+  bool _isLoading = false;
+  Future<String> getProfiles() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    id = preferences.getInt("id").toString();
+    nama_lengkap = preferences.getString("nama_lengkap").toString();
+    no_wa = preferences.getString("no_wa").toString();
+    idgroup = preferences.getString("idgroup").toString();
+    setState(() {
+      _isLoading = false;
+      idku = id;
+      nama_lengkap1 = nama_lengkap;
+      no_wa1 = no_wa;
+      idgroup1 = idgroup;
+      getCurrentLocation();
+    });
+  }
 
   getCurrentLocation() async {
     setState(() {
@@ -48,13 +75,16 @@ class _AllimageState extends State<Allimage> {
       loadingdokter = true;
     });
 
-    final responsee = await http.get(Uri.parse(RestApi.getimage));
+    final responsee = await http.post(Uri.parse(RestApi.viewredbiring), body: {
+      "idgroup": idgroup1,
+    });
+
     if (responsee.statusCode == 200) {
       final datadokter = jsonDecode(responsee.body);
-      print(datadokter);
+  
       setState(() {
         for (Map i in datadokter) {
-          _list.add(Listimagecari.fromJson(i));
+          _list.add(Listviewredbeiring.fromJson(i));
           loadingdokter = false;
         }
       });
@@ -73,8 +103,7 @@ class _AllimageState extends State<Allimage> {
       return;
     }
     _list.forEach((f) {
-      if (f.namalokasi.contains(text) || f.namalokasi.contains(text))
-        _search.add(f);
+      if (f.nama.contains(text) || f.nama.contains(text)) _search.add(f);
     });
     setState(() {});
   }
@@ -82,11 +111,24 @@ class _AllimageState extends State<Allimage> {
   @override
   void initState() {
     super.initState();
-    getCurrentLocation();
+    getProfiles();
+
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
   }
 
   @override
   void dispose() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     super.dispose();
   }
 
@@ -151,13 +193,13 @@ class _AllimageState extends State<Allimage> {
                           child: new TextField(
                             controller: controller,
                             onChanged: _onsearch,
-                            autofocus: true,
+                            autofocus: false,
                             decoration: InputDecoration(
                                 disabledBorder: InputBorder.none,
                                 focusedBorder: InputBorder.none,
                                 enabledBorder: InputBorder.none,
                                 errorBorder: InputBorder.none,
-                                hintText: "Cari Lokasi",
+                                hintText: "Search",
                                 suffixIcon: IconButton(
                                   onPressed: () {
                                     controller.clear();
@@ -175,7 +217,7 @@ class _AllimageState extends State<Allimage> {
                           ),
                         ),
                         Container(
-                            height: MediaQuery.of(context).size.height / 1.8,
+                            height: MediaQuery.of(context).size.height / 1.2,
                             child: loadingdokter
                                 ? Center()
                                 : Container(
@@ -203,9 +245,20 @@ class _AllimageState extends State<Allimage> {
                                                             height: 7,
                                                           ),
                                                           InkWell(
-                                                            onTap: () {},
+                                                            onTap: () {
+                                                              Navigator.push(
+                                                                  context,
+                                                                  MaterialPageRoute(
+                                                                      builder: (context) =>
+                                                                          Multipoly(
+                                                                            idring:
+                                                                                dt.id.toString(),
+                                                                            distance:
+                                                                                dt.distance,
+                                                                          )));
+                                                            },
                                                             child: Container(
-                                                              height: 60,
+                                                              height: 90,
                                                               decoration:
                                                                   BoxDecoration(
                                                                       color: Color(
@@ -244,54 +297,38 @@ class _AllimageState extends State<Allimage> {
                                                                               .start,
                                                                       children: [
                                                                         Text(
-                                                                          "Lokasi",
+                                                                          "Name",
                                                                           style: TextStyle(
                                                                               fontFamily: 'Kali',
                                                                               fontSize: 15),
                                                                         ),
                                                                         Text(
-                                                                            dt.namalokasi,
+                                                                            dt.nama,
+                                                                            style: TextStyle(
+                                                                              fontSize: 14,
+                                                                              fontFamily: 'Kali',
+                                                                            )),
+                                                                        Row(
+                                                                          children: [
+                                                                            Text("Distance:",
+                                                                                style: TextStyle(
+                                                                                  fontSize: 14,
+                                                                                  fontFamily: 'Kali',
+                                                                                )),
+                                                                            Text(dt.distance,
+                                                                                style: TextStyle(
+                                                                                  fontSize: 14,
+                                                                                  fontFamily: 'Kali',
+                                                                                )),
+                                                                          ],
+                                                                        ),
+                                                                        Text(
+                                                                            dt.distance,
                                                                             style: TextStyle(
                                                                               fontSize: 14,
                                                                               fontFamily: 'Kali',
                                                                             )),
                                                                       ],
-                                                                    ),
-                                                                    InkWell(
-                                                                      onTap:
-                                                                          () {
-                                                                        Navigator.push(
-                                                                            context,
-                                                                            MaterialPageRoute(
-                                                                                builder: (context) => Uploadimages(
-                                                                                      id: dt.id,
-                                                                                    )));
-                                                                      },
-                                                                      child:
-                                                                          Icon(
-                                                                        Icons
-                                                                            .photo_album,
-                                                                        size:
-                                                                            40,
-                                                                      ),
-                                                                    ),
-                                                                    InkWell(
-                                                                      onTap:
-                                                                          () {
-                                                                        Navigator.push(
-                                                                            context,
-                                                                            MaterialPageRoute(
-                                                                                builder: (context) => Uploadimages(
-                                                                                      id: dt.id,
-                                                                                    )));
-                                                                      },
-                                                                      child:
-                                                                          Icon(
-                                                                        Icons
-                                                                            .add_photo_alternate_outlined,
-                                                                        size:
-                                                                            40,
-                                                                      ),
                                                                     ),
                                                                   ],
                                                                 ),
@@ -313,9 +350,7 @@ class _AllimageState extends State<Allimage> {
                                                         const EdgeInsets.all(
                                                             8.0),
                                                     child: InkWell(
-                                                      onTap: () {
-                                                        print("asdasd");
-                                                      },
+                                                      onTap: () {},
                                                       child: Container(
                                                           child: Column(
                                                         crossAxisAlignment:
@@ -326,9 +361,22 @@ class _AllimageState extends State<Allimage> {
                                                             height: 7,
                                                           ),
                                                           InkWell(
-                                                            onTap: () {},
+                                                            onTap: () {
+                                                            //  print(dr.id);
+
+                                                              Navigator.push(
+                                                                  context,
+                                                                  MaterialPageRoute(
+                                                                      builder: (context) =>
+                                                                          Multipoly(
+                                                                            idring:
+                                                                                dr.id.toString(),
+                                                                            distance:
+                                                                                dr.distance,
+                                                                          )));
+                                                            },
                                                             child: Container(
-                                                              height: 60,
+                                                              height: 100,
                                                               decoration:
                                                                   BoxDecoration(
                                                                       color: Color(
@@ -370,58 +418,30 @@ class _AllimageState extends State<Allimage> {
                                                                               .start,
                                                                       children: [
                                                                         Text(
-                                                                          "Nama Lokasi",
+                                                                          "Name",
                                                                           style: TextStyle(
                                                                               fontFamily: 'Kali',
                                                                               fontSize: 15),
                                                                         ),
                                                                         Text(
-                                                                            dr.namalokasi,
+                                                                            dr.nama,
                                                                             style: TextStyle(
                                                                               fontSize: 14,
                                                                               fontFamily: 'Kali',
                                                                             )),
-                                                                      ],
-                                                                    ),
-                                                                    Row(
-                                                                      children: [
-                                                                        InkWell(
-                                                                          onTap:
-                                                                              () {
-                                                                            Navigator.push(
-                                                                                context,
-                                                                                MaterialPageRoute(
-                                                                                    builder: (context) => Daftarimage(
-                                                                                          idimage: dr.id,
-                                                                                        )));
-                                                                          },
-                                                                          child:
-                                                                              Icon(
-                                                                            Icons.photo_album,
-                                                                            size:
-                                                                                40,
-                                                                          ),
-                                                                        ),
-                                                                        SizedBox(
-                                                                          width:
-                                                                              15,
-                                                                        ),
-                                                                        InkWell(
-                                                                          onTap:
-                                                                              () {
-                                                                            Navigator.push(
-                                                                                context,
-                                                                                MaterialPageRoute(
-                                                                                    builder: (context) => Uploadimages(
-                                                                                          id: dr.id,
-                                                                                        )));
-                                                                          },
-                                                                          child:
-                                                                              Icon(
-                                                                            Icons.add_photo_alternate_outlined,
-                                                                            size:
-                                                                                40,
-                                                                          ),
+                                                                        Row(
+                                                                          children: [
+                                                                            Text("Distance:",
+                                                                                style: TextStyle(
+                                                                                  fontSize: 14,
+                                                                                  fontFamily: 'Kali',
+                                                                                )),
+                                                                            Text(dr.distance,
+                                                                                style: TextStyle(
+                                                                                  fontSize: 14,
+                                                                                  fontFamily: 'Kali',
+                                                                                )),
+                                                                          ],
                                                                         ),
                                                                       ],
                                                                     ),

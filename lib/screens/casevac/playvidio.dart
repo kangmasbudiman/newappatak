@@ -36,7 +36,7 @@ class _PlayvidioState extends State<Playvidio> {
 
 
 Future<void> initializePlayer() async {
-    _videoPlayerController1 = VideoPlayerController.network('http://8.215.39.14/amarta/public/upload/event/'+widget.vidio);
+    _videoPlayerController1 = VideoPlayerController.network('http://202.43.164.229/amartamedia/public/public/upload/slider/' +widget.vidio);
     await _videoPlayerController1.initialize();
 
     _chewieController = ChewieController(

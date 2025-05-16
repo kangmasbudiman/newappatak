@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_map_live/core/models/modelpolygon.dart';
 import 'package:google_map_live/restapi/restApi.dart';
 import 'package:google_map_live/screens/adduser.dart';
@@ -176,7 +177,25 @@ class _AlluserState extends State<Alluser> {
     getLocation();
     tampil();
     getProfiles();
+      SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeRight,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   }
+
+    @override
+  void dispose() {
+     SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeRight,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {

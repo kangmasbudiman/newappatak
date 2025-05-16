@@ -45,13 +45,16 @@ class _GetbookmarkState extends State<Getbookmark> {
     setState(() {
       loading = true;
     });
+    print("ini idku");
+    print(idku);
     final response = await http.post(Uri.parse(RestApi.getbookmark), body: {
       "iduser": idku,
     });
     if (response.contentLength == 2) {
     } else {
       final datapromo = jsonDecode(response.body);
-
+      print("ini data get bookmark");
+      print(datapromo);
       datapromo.forEach((api) {
         final p = new Modepolygonfavorit(api['idpolygon'], api['title']);
         listarea.add(p);
@@ -171,6 +174,7 @@ class _GetbookmarkState extends State<Getbookmark> {
       nama_lengkap1 = nama_lengkap;
       no_wa1 = no_wa;
     });
+    tampil();
   }
 
   @override
@@ -178,7 +182,6 @@ class _GetbookmarkState extends State<Getbookmark> {
     // TODO: implement initState
     super.initState();
     getLocation();
-    tampil();
     getProfiles();
   }
 

@@ -170,7 +170,30 @@ class _MapfavoritState extends State<Mapfavorit> {
     // TODO: implement initState
     super.initState();
     initCamera();
+      SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+       DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+
+  ]);
   }
+
+
+
+
+  @override
+  void dispose() {
+     SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeRight,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+    super.dispose();
+  }
+
+
 
   @override
   Widget build(BuildContext context) {

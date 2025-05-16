@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_map_live/core/models/locasimodel.dart';
 import 'package:google_map_live/core/models/location_model.dart';
 import 'package:google_map_live/core/models/modelpolygonfavorit.dart';
@@ -85,10 +86,27 @@ class _MapfavoritbookmarkState extends State<Mapfavoritbookmark> {
     super.initState();
     getLocation();
     tampil();
-/*
-  
-    */
+  SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+       DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+
+  ]);
   }
+
+    @override
+  void dispose() {
+     SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeRight,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+    super.dispose();
+  }
+
+  
 
   @override
   Widget build(BuildContext context) {

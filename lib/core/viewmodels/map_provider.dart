@@ -117,7 +117,8 @@ class MapProvider extends ChangeNotifier {
     _polygons.clear();
     _markers.clear();
     List<PolyMakerModel> result = await polyMakerServices.getAll();
-
+    print("ini data resultnya");
+    print(result);
     for (var polyMaker in result) {
       polygons.add(Polygon(
         polygonId: PolygonId("${polyMaker.id}-${polyMaker.title}"),
@@ -126,7 +127,7 @@ class MapProvider extends ChangeNotifier {
             .toList(),
         strokeWidth: 3,
         fillColor: Colors.red.withOpacity(0.3),
-        strokeColor: Colors.red,
+        strokeColor: Colors.yellow,
       ));
 
       setMarkerLocation(
@@ -204,10 +205,13 @@ class MapProvider extends ChangeNotifier {
       if (_uniqueID == "") {
         _uniqueID = Random().nextInt(10000).toString();
       }
-      _tempLocation.add(_location);
 
+      //_tempLocation.add(_location);
+      print("ini ambildata dari tempat baru");
       setMarkerLocation(_tempLocation.length.toString(), _location, _pointIcon);
       setTempToPolygon();
+
+      print(_tempLocation);
     }
     notifyListeners();
   }
@@ -274,33 +278,34 @@ class MapProvider extends ChangeNotifier {
     if (_tempLocation.length > 0) {
       DialogUtils.showReport(context, "Save Area", titleController, () async {
         Navigator.pop(context);
-        print("ini datatemp location");
+        print("ini hasil ambil temp location");
         print(_tempLocation);
         //Inserting to database
         var polyMakerModel = PolyMakerModel(
             title: titleController.text,
-
             location: _tempLocation
-                .map((_loc) => LocationModel.fromMap(
-                    {"latitude": _loc.latitude.toString(), "longitude": _loc.longitude.toString()}))
+                .map((_loc) => LocationModel.fromMap({
+                      "latitude": _loc.latitude.toString(),
+                      "longitude": _loc.longitude.toString()
+                    }))
                 .toList());
 
+        //  print(_tempLocation);
+        // print(polyMakerModel);
 
         try {
           bool result = await polyMakerServices.create(polyMakerModel);
 
           if (result) {
-            DialogUtils.showDialogWarning(context, "Menyimpan Area",
-                "Berhasil Menyimpan ", () => Navigator.pop(context));
+            DialogUtils.showDialogWarning(context, "Save Area", "Save Success",
+                () => Navigator.pop(context));
           }
           changeEditMode();
         } catch (e) {
-          DialogUtils.showDialogWarning(context, "Gagal Menyimpan",
-              "Gagal Menyimpan lokasi ", () => Navigator.pop(context));
+          DialogUtils.showDialogWarning(
+              context, "Field", "Field", () => Navigator.pop(context));
           changeEditMode();
         }
-
-        
       });
     }
   }

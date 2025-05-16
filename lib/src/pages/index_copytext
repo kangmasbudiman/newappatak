@@ -1,0 +1,191 @@
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:agora_uikit/agora_uikit.dart';
+import 'package:flutter/material.dart';
+import 'package:google_map_live/restapi/restApi.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:http/http.dart' as http;
+import './call.dart';
+
+class IndexPage extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => IndexState();
+}
+
+class IndexState extends State<IndexPage> {
+  /// create a channelController to retrieve text value
+  final _channelController = TextEditingController();
+
+  /// if channel textField is validated to have error
+  bool _validateError = false;
+
+  ClientRole _role = ClientRole.Broadcaster;
+  String token = "";
+  bool _loading = false;
+  gettoken() async {
+    setState(() {
+      _loading = true;
+    });
+    final response = await http.get(Uri.parse(RestApi.tokenku));
+    if (response.contentLength == 2) {
+    } else {
+      final data = jsonDecode(response.body);
+      setState(() {
+        token = data['rtcToken'];
+        _loading = false;
+      });
+      print("ini token ku");
+      print(token);
+    }
+  }
+
+  final AgoraClient _client = AgoraClient(
+    agoraConnectionData: AgoraConnectionData(
+      
+    ),
+  );
+
+  @override
+  void dispose() {
+    // dispose input controller
+    _channelController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    gettoken();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: ListView(
+        children: [
+          Center(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              height: 400,
+              child: Column(
+                children: <Widget>[
+                  SizedBox(height: 40),
+                  _loading ? CircularProgressIndicator() : Text(token),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                          child: TextField(
+                        controller: _channelController,
+                        decoration: InputDecoration(
+                          errorText: _validateError
+                              ? 'Channel name is mandatory'
+                              : null,
+                          border: UnderlineInputBorder(
+                            borderSide: BorderSide(width: 1),
+                          ),
+                          hintText: 'Channel name',
+                        ),
+                      ))
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      ListTile(
+                        title: Text(ClientRole.Broadcaster.toString()),
+                        leading: Radio(
+                          value: ClientRole.Broadcaster,
+                          groupValue: _role,
+                          onChanged: (ClientRole value) {
+                            setState(() {
+                              _role = value;
+                              print(_role);
+                            });
+                          },
+                        ),
+                      ),
+                      /*
+                      ListTile(
+                        title: Text(ClientRole.Audience.toString()),
+                        leading: Radio(
+                          value: ClientRole.Audience,
+                          groupValue: _role,
+                          onChanged: (ClientRole? value) {
+                            setState(() {
+                              _role = value;
+                            });
+                          },
+                        ),
+                      )
+      */
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: onJoin,
+                            child: Text('Join'),
+                            style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(
+                                    Colors.blueAccent),
+                                foregroundColor:
+                                    MaterialStateProperty.all(Colors.white)),
+                          ),
+                        ),
+                        // Expanded(
+                        //   child: RaisedButton(
+                        //     onPressed: onJoin,
+                        //     child: Text('Join'),
+                        //     color: Colors.blueAccent,
+                        //     textColor: Colors.white,
+                        //   ),
+                        // )
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> onJoin() async {
+    // update input validation
+    setState(() {
+      _channelController.text.isEmpty
+          ? _validateError = true
+          : _validateError = false;
+    });
+    if (_channelController.text.isNotEmpty) {
+      // await for camera and mic permissions before pushing video page
+      await _handleCameraAndMic(Permission.camera);
+      await _handleCameraAndMic(Permission.microphone);
+      // push video page with given channel name
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CallPage(
+            tokenn:
+                '0068c888dce37cc448cbee9e90c41740053IADyFFHoM2UzhdV/r0abRnT0+gqTafTLcdRpHFYGMyPy/wx+f9i379yDIgBl22ocnTo0YwQAAQAt9zJjAgAt9zJjAwAt9zJjBAAt9zJj',
+            //  tokenn: token,
+            channelName: _channelController.text,
+            role: _role,
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> _handleCameraAndMic(Permission permission) async {
+    final status = await permission.request();
+    print(status);
+  }
+}

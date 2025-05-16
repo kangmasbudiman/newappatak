@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_map_live/restapi/restApi.dart';
 import 'package:google_map_live/screens/imagelokasi/viewmarker.dart';
 
@@ -18,8 +19,6 @@ class Uploadimages extends StatefulWidget {
 class _UploadimagesState extends State<Uploadimages> {
   var vidiourl;
   void pickvidio() async {
-
-    
     FilePickerResult result = await FilePicker.platform.pickFiles();
 
     if (result != null) {
@@ -61,10 +60,8 @@ class _UploadimagesState extends State<Uploadimages> {
             TextButton(
               child: const Text('OK'),
               onPressed: () {
-                   Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Viewmarker()));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Viewmarker()));
               },
             ),
           ],
@@ -93,10 +90,37 @@ class _UploadimagesState extends State<Uploadimages> {
             TextButton(
               child: const Text('OK'),
               onPressed: () {
-                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Viewmarker()));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Viewmarker()));
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> uploadgagal() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text(
+                  'Upload Image Gagal',
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.pop(context);
               },
             ),
           ],
@@ -122,14 +146,11 @@ class _UploadimagesState extends State<Uploadimages> {
       print("upload berhasil");
       setState(() {
         loading = false;
-       
       });
-        Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Viewmarker()));
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => Viewmarker()));
     } else {
-      print("upload tidak berhasil");
+      uploadgagal();
     }
   }
 
@@ -137,8 +158,23 @@ class _UploadimagesState extends State<Uploadimages> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    print("id image");
-    print(widget.id);
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  }
+
+  @override
+  void dispose() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    super.dispose();
   }
 
   @override
@@ -160,7 +196,16 @@ class _UploadimagesState extends State<Uploadimages> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  Text(
+                    "Pilih image yang akan di upload",
+                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                  ),
                   ElevatedButton(
+                      style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.black),
+                          textStyle: MaterialStateProperty.all(
+                              TextStyle(fontSize: 15))),
                       onPressed: () {
                         pickvidio();
                       },
@@ -171,6 +216,11 @@ class _UploadimagesState extends State<Uploadimages> {
                     height: 15,
                   ),
                   ElevatedButton(
+                      style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.black),
+                          textStyle: MaterialStateProperty.all(
+                              TextStyle(fontSize: 15))),
                       onPressed: () {
                         save();
                       },

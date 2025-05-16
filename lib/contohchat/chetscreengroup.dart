@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_map_live/contohchat/firebasehelp.dart';
 import 'package:google_map_live/contohchat/tammpilpesan.dart';
 import 'package:intl/intl.dart';
@@ -69,7 +70,25 @@ class _ChetscreenState extends State<Chetscreen> {
     print("Ini Lah dia");
     print(widget.id);
     print(widget.nama);
+      SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeRight,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   }
+
+    @override
+  void dispose() {
+     SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeRight,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +120,7 @@ class _ChetscreenState extends State<Chetscreen> {
                       child: Container(
                         child: TextField(
                           controller: message,
-                          decoration: InputDecoration(hintText: "Tulis Pesan"),
+                          decoration: InputDecoration(hintText: "Write"),
                         ),
                       ),
                     ),
@@ -137,7 +156,6 @@ class _ChetscreenState extends State<Chetscreen> {
           .orderBy("time", descending: true)
           .where("penerima", isEqualTo: "${id}")
           .limit(50)
-         
           .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
@@ -151,7 +169,7 @@ class _ChetscreenState extends State<Chetscreen> {
           itemCount: snapshot.data.docs.length,
           itemBuilder: (context, i) {
             QueryDocumentSnapshot x = snapshot.data.docs[i];
-          
+
             return ListTile(
               title: Column(
                 crossAxisAlignment: idku == x['userid']
@@ -161,7 +179,7 @@ class _ChetscreenState extends State<Chetscreen> {
                   Container(
                       color: idku == x['userid']
                           ? Colors.blueAccent[100].withOpacity(0.2)
-                          : Colors.amber[100],
+                          : Colors.amber,
                       padding: EdgeInsets.symmetric(horizontal: 15),
                       child: Text(x['msg'])),
                 ],
